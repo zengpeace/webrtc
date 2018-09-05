@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+<script src="/integration"></script>
+<script>
+
+
+/* eslint-env browser */
+
+let pc = new RTCPeerConnection()
+let log = msg => {
+  console.log(msg)
+}
+
+pc.onsignalingstatechange = e => log(pc.signalingState)
+pc.oniceconnectionstatechange = e => log(pc.iceConnectionState)
+pc.onicecandidate = event => {
+	Signal(pc.localDescription)
+}
+
+pc.ondatachannel = e => {
+  let dc = e.channel
+  log('New DataChannel ' + dc.label)
+  dc.onclose = () => log('dc has closed')
+  dc.onopen = () => log('dc has opened')
+  dc.onmessage = e => {
+  	log(`Message from DataChannel '${dc.label}' payload '${e.data}'`)
+	PostResult("onmessage", `${e.data}`)
+  }
+}
+
+OnSignal(function(desc){
+  log(desc)
+ 
+  pc.setRemoteDescription(desc).catch(log)
+  pc.createAnswer().then(d => pc.setLocalDescription(d)).catch(log)
+})
+
+
+</script> 
+</head>
+</html>

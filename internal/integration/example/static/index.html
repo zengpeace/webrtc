@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<head>
+<script src="/integration"></script>
+<script>
+
+OnSignal(function(desc){
+	console.log(desc)
+	PostResult("index")
+})
+
+Signal({type:"Offer", sdp:"test"})
+
+
+</script> 
+</head>
+</html>
