@@ -7,7 +7,7 @@ require (
 	github.com/pions/logging v0.1.0
 	github.com/pions/quic v0.0.1
 	github.com/pions/rtcp v1.1.2
-	github.com/pions/rtp v1.1.0
+	github.com/pions/rtp v1.1.1-0.20190327193827-c20020e9c21d
 	github.com/pions/sctp v1.4.2
 	github.com/pions/sdp/v2 v2.1.0
 	github.com/pions/srtp v1.1.2
