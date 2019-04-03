@@ -8,7 +8,7 @@ require (
 	github.com/pions/quic v0.1.0
 	github.com/pions/rtcp v1.1.2
 	github.com/pions/rtp v1.1.0
-	github.com/pions/sctp v1.4.3
+	github.com/pions/sctp v1.4.4-0.20190402174643-866a26be67cb
 	github.com/pions/sdp/v2 v2.1.0
 	github.com/pions/srtp v1.1.2
 	github.com/pions/transport v0.5.0
