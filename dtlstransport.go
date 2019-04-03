@@ -14,6 +14,7 @@ import (
 	"time"
 
 	"github.com/pions/dtls"
+	"github.com/pions/logging"
 	"github.com/pions/srtp"
 	"github.com/pions/webrtc/internal/mux"
 	"github.com/pions/webrtc/internal/util"
@@ -41,13 +42,17 @@ type DTLSTransport struct {
 	srtcpSession  *srtp.SessionSRTCP
 	srtpEndpoint  *mux.Endpoint
 	srtcpEndpoint *mux.Endpoint
+	log           *logging.LeveledLogger
 }
 
 // NewDTLSTransport creates a new DTLSTransport.
 // This constructor is part of the ORTC API. It is not
 // meant to be used together with the basic WebRTC API.
 func (api *API) NewDTLSTransport(transport *ICETransport, certificates []Certificate) (*DTLSTransport, error) {
-	t := &DTLSTransport{iceTransport: transport}
+	t := &DTLSTransport{
+		iceTransport: transport,
+		log:          logging.NewScopedLogger("dtls-transport"),
+	}
 
 	if len(certificates) > 0 {
 		now := time.Now()
@@ -200,6 +205,7 @@ func (t *DTLSTransport) Start(remoteParameters DTLSParameters) error {
 	}
 	if t.isClient() {
 		// Assumes the peer offered to be passive and we accepted.
+		t.log.Trace("Establish DTLS Client Connection")
 		dtlsConn, err := dtls.Client(dtlsEndpoint, dtlsCofig)
 		if err != nil {
 			return err
@@ -207,6 +213,7 @@ func (t *DTLSTransport) Start(remoteParameters DTLSParameters) error {
 		t.conn = dtlsConn
 	} else {
 		// Assumes we offer to be passive and this is accepted.
+		t.log.Trace("Establish DTLS Server Connection")
 		dtlsConn, err := dtls.Server(dtlsEndpoint, dtlsCofig)
 		if err != nil {
 			return err

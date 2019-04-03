@@ -855,6 +855,8 @@ func (pc *PeerConnection) SetRemoteDescription(desc SessionDescription) error {
 		if weOffer {
 			iceRole = ICERoleControlling
 		}
+
+		pc.log.Trace("Start ICE transport")
 		err := pc.iceTransport.Start(
 			pc.iceGatherer,
 			ICEParameters{
@@ -871,6 +873,7 @@ func (pc *PeerConnection) SetRemoteDescription(desc SessionDescription) error {
 			return
 		}
 
+		pc.log.Trace("Start DTLS transport")
 		// Start the dtls transport
 		err = pc.dtlsTransport.Start(DTLSParameters{
 			Role:         DTLSRoleAuto,
@@ -882,6 +885,7 @@ func (pc *PeerConnection) SetRemoteDescription(desc SessionDescription) error {
 			return
 		}
 
+		pc.log.Trace("Setup SRTP connection")
 		pc.openSRTP()
 
 		for _, tranceiver := range pc.rtpTransceivers {
@@ -903,6 +907,7 @@ func (pc *PeerConnection) SetRemoteDescription(desc SessionDescription) error {
 		go pc.drainSRTP()
 
 		// Start sctp
+		pc.log.Trace("Start SCTP transport")
 		err = pc.sctpTransport.Start(SCTPCapabilities{
 			MaxMessageSize: 0,
 		})
@@ -959,6 +964,7 @@ func (pc *PeerConnection) openSRTP() {
 	}
 
 	for i := range incomingSSRCes {
+		pc.log.Tracef("Run goroutine for incoming SSRC: %d, CodecType: %s", i, incomingSSRCes[i].String())
 		go func(ssrc uint32, codecType RTPCodecType) {
 			receiver, err := pc.api.NewRTPReceiver(codecType, pc.dtlsTransport)
 			if err != nil {

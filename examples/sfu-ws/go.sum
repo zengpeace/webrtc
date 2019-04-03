@@ -45,6 +45,8 @@ github.com/pions/rtp v1.1.0/go.mod h1:Bro/2l0PS5C3SQaEpLA+H34kpKIurx3K2Zln/nKjRM
 github.com/pions/sctp v1.3.0/go.mod h1:GZTG/xApE7wdUFEQq2Rmzgxl/+YaB/L1k8xUl1D5bmo=
 github.com/pions/sctp v1.4.2 h1:oOV8oLmGds2GZnIeGSHn8d385kwBxNeWNJ0kJOIR4yY=
 github.com/pions/sctp v1.4.2/go.mod h1:Yws4nn6vR0npKJ2n2R+Cm+0JGaMKca0M1pYdGXovz3o=
+github.com/pions/sdp v1.3.0 h1:HIv6ZvdzRPq+H4T8EV8K9pZ4EGnYOr14HFZ9Rksh6/0=
+github.com/pions/sdp v1.3.0/go.mod h1:moNMmnVSlx8rBBb39U9t0Rdr7xvMlqiJjHlMESRad5k=
 github.com/pions/sdp/v2 v2.1.0 h1:YbbbaceX1aB6j3hPVdQ6GnniIRKqT/rmfnt4XvKR/E0=
 github.com/pions/sdp/v2 v2.1.0/go.mod h1:KGRBcHfpkgJXjrzKJz2wj/Jf1KWnsHdoIiqtayQ5QmE=
 github.com/pions/srtp v1.1.2 h1:mMhn9jsMUokSq+Owyviz6zw9BblBQhHiCB21kpP8KOE=
