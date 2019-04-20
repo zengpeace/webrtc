@@ -63,7 +63,7 @@ type PeerConnection struct {
 	// OnNegotiationNeeded        func() // FIXME NOT-USED
 	// OnICECandidateError        func() // FIXME NOT-USED
 
-	// OnConnectionStateChange    func() // FIXME NOT-USED
+	onConnectionStateChangeHandler func(PeerConnectionState) // FIXME NOT-USED
 
 	onSignalingStateChangeHandler     func(SignalingState)
 	onICEConnectionStateChangeHandler func(ICEConnectionState)
@@ -212,6 +212,34 @@ func (pc *PeerConnection) initConfiguration(configuration Configuration) error {
 	}
 
 	return nil
+}
+
+// OnConnectionStateChange sets an event handler which is invoked when the
+// peer connection's connection state changes
+func (pc *PeerConnection) OnConnectionStateChange(f func(PeerConnectionState)) {
+	pc.mu.Lock()
+	defer pc.mu.Unlock()
+	pc.onConnectionStateChangeHandler = f
+}
+
+func (pc *PeerConnection) onConnectionStateChange(newState PeerConnectionState) (done chan struct{}) {
+	pc.mu.RLock()
+	hdlr := pc.onConnectionStateChangeHandler
+	pc.mu.RUnlock()
+
+	pc.log.Infof("connectionstate changed to %s", newState)
+	done = make(chan struct{})
+	if hdlr == nil {
+		close(done)
+		return
+	}
+
+	go func() {
+		hdlr(newState)
+		close(done)
+	}()
+
+	return
 }
 
 // OnSignalingStateChange sets an event handler which is invoked when the
@@ -982,8 +1010,9 @@ func (pc *PeerConnection) SetRemoteDescription(desc SessionDescription) error {
 	})
 
 	go func() {
-		// Star the networking in a new routine since it will block until
+		// Start the networking in a new routine since it will block until
 		// the connection is actually established.
+		pc.onConnectionStateChange(PeerConnectionStateConnecting)
 
 		// Start the ice transport
 		iceRole := ICERoleControlled
@@ -1003,6 +1032,7 @@ func (pc *PeerConnection) SetRemoteDescription(desc SessionDescription) error {
 		if err != nil {
 			// TODO: Handle error
 			pc.log.Warnf("Failed to start manager: %s", err)
+			pc.onConnectionStateChange(PeerConnectionStateFailed)
 			return
 		}
 
@@ -1014,9 +1044,11 @@ func (pc *PeerConnection) SetRemoteDescription(desc SessionDescription) error {
 		if err != nil {
 			// TODO: Handle error
 			pc.log.Warnf("Failed to start manager: %s", err)
+			pc.onConnectionStateChange(PeerConnectionStateFailed)
 			return
 		}
 
+		pc.onConnectionStateChange(PeerConnectionStateConnected)
 		pc.openSRTP()
 
 		for _, tranceiver := range pc.GetTransceivers() {
